@@ -1,6 +1,7 @@
 using AzureProjectMagdalenaGorska.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Azure.Cosmos;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,8 +40,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
+
+var configuration = (IConfiguration)app.Services.GetService(typeof(IConfiguration))!;
+app.MapGet("/", () => $"Hello World! Value: {configuration.GetSection("test").Value}");
+app.MapGet("/db", () => $"Hello Database! Value: {configuration.GetSection("AzureCosmosDbSettings").GetValue<string>("DatabaseName")}");
 
 app.Run();
 
