@@ -1,13 +1,18 @@
 using AzureProjectMagdalenaGorska.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Azure.Cosmos;
+using Microsoft.OpenApi.Models;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+    {
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+});
 
 builder.Services.AddSingleton<ICarCosmosService>(options =>
 {
@@ -31,11 +36,18 @@ builder.Services.AddSingleton<ICarCosmosService>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
+
 
 app.UseHttpsRedirection();
 
