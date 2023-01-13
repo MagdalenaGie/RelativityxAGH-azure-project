@@ -112,7 +112,6 @@ namespace UnitTests
             var okResult = await _controller.Delete(movie.Id, movie.Type);
 
             // Assert
-            Assert.IsType<OkObjectResult>(okResult);
             Assert.IsType<OkResult>(okResult);
         }
 
