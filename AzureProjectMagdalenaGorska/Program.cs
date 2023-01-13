@@ -8,13 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
     {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My Azure Project API", Version = "v1" });
 });
 
-builder.Services.AddSingleton<ICarCosmosService>(options =>
+builder.Services.AddSingleton<IMovieCosmosService>(options =>
 {
     string url = builder.Configuration.GetSection("AzureCosmosDbSettings")
     .GetValue<string>("URL");
@@ -30,22 +29,15 @@ builder.Services.AddSingleton<ICarCosmosService>(options =>
         primaryKey
     );
 
-    return new CarCosmosService(cosmosClient, dbName, containerName);
+    return new MovieCosmosService(cosmosClient, dbName, containerName);
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Azure Project API V1");
 });
 
 
@@ -54,78 +46,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-var configuration = (IConfiguration)app.Services.GetService(typeof(IConfiguration))!;
-app.MapGet("/", () => $"Hello World! Value: {configuration.GetSection("test").Value}");
-app.MapGet("/db", () => $"Hello Database! Value: {configuration.GetSection("AzureCosmosDbSettings").GetValue<string>("DatabaseName")}");
-
-app.Run();
-
-
-// INITIAL
-//var builder = WebApplication.CreateBuilder(args);
-//var app = builder.Build();
 //var configuration = (IConfiguration)app.Services.GetService(typeof(IConfiguration))!;
 //app.MapGet("/", () => $"Hello World! Value: {configuration.GetSection("test").Value}");
-//app.Run();
+//app.MapGet("/db", () => $"Hello Database! Value: {configuration.GetSection("AzureCosmosDbSettings").GetValue<string>("DatabaseName")}");
 
-//using AzureProjectMagdalenaGorska;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.Extensions.Options;
-
-//var builder = WebApplication.CreateBuilder(args);
-//var accountEndpoint = "https://azureprojectmgaccount.documents.azure.com:443/";
-//var accountKey = "HRDTuVQsUWMnUe6VEXa7887tifVnsFEtXvfoDPh7nO9p1mMT56Kb8ZupVrJZ2IbZ2EV3DS5vjOogACDb1IqTxw==";
-//var databaseName = "ToDoList";
-
-//builder.Services.AddDbContext<TodoDb>(opt => opt.UseCosmos(accountEndpoint, accountKey, databaseName));
-////builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
-////builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-//var app = builder.Build();
-
-//app.MapGet("/todoitems", async (TodoDb db) =>
-//    await db.Todos.ToListAsync());
-
-//app.MapGet("/todoitems/complete", async (TodoDb db) =>
-//    await db.Todos.Where(t => t.IsComplete).ToListAsync());
-
-//app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-//    await db.Todos.FindAsync(id)
-//        is Todo todo
-//            ? Results.Ok(todo)
-//            : Results.NotFound());
-
-//app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
-//{
-//    db.Todos.Add(todo);
-//    await db.SaveChangesAsync();
-
-//    return Results.Created($"/todoitems/{todo.Id}", todo);
-//});
-
-//app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
-//{
-//    var todo = await db.Todos.FindAsync(id);
-
-//    if (todo is null) return Results.NotFound();
-
-//    todo.Name = inputTodo.Name;
-//    todo.IsComplete = inputTodo.IsComplete;
-
-//    await db.SaveChangesAsync();
-
-//    return Results.NoContent();
-//});
-
-//app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
-//{
-//    if (await db.Todos.FindAsync(id) is Todo todo)
-//    {
-//        db.Todos.Remove(todo);
-//        await db.SaveChangesAsync();
-//        return Results.Ok(todo);
-//    }
-
-//    return Results.NotFound();
-//});
-
-//app.Run();
+app.Run();
